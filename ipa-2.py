@@ -166,23 +166,25 @@ def vigenere_cipher(message, key):
     # Stay within the function. Only use the parameters as input. The function should return your answer.
     
 def vigenere_cipher(message, key):
-    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    key = key * ((len(message) // len (key)) + 1)
-    encrypted_message = " "
-    
-    for i in range(len(message)):
-        letter = message[i]
-        if letter in alphabet:
-            message_index = alphabet.index(letter)
-            key_index = alphabet.index(key[i])
-            shifted_index = (message_index + key_index) % len(alphabet)
-            shifted_letter = alphabet[shifted_index]
-            encrypted_message += shifted_letter
-            
-        elif letter == " ":
-            encrypted_message += " "
-            
-    return encrypted_message
+    encrypted_message = ""
+    index = 0
+    for letter in message: 
+        if letter == " ":
+            new_message += " "
+            index += 1
+            if index >= len(key):
+                index = index % len(key)
+        else:
+            num = ord(letter) - ord("A") + 1 
+            num += ord(key[index]) - ord("A")
+            if num > 26:
+                num = num % 26 
+            out = chr(num + ord("A") - 1)
+            new_message += out 
+            index += 1
+            if index >= len(key):
+                index = index % len(key)
+    return str(new_message)
 
 def scytale_cipher(message, shift):
     '''Scytale Cipher.
@@ -240,11 +242,15 @@ def scytale_cipher(message, shift):
 def scytale_cipher(message, shift):
     encoded_message = ""
     length = len(message)
-    if length % shift != 0:
-        message += "_" * (shift - (length % shift))
-        
-    for i in range(len(message)):
-        index = (i // shift) + (length // shift) * (i % shift)
+    
+    update = (shift - length % shift) % shift
+    message += "_" * update
+
+    # Update the length
+    length = len(message)
+    
+    for i in range(length):
+        index = (i % shift) * (length // shift) + (i // shift)
         encoded_message += message[index]
         
     return encoded_message
